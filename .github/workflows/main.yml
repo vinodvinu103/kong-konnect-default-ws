@@ -12,12 +12,14 @@ jobs:
     # Ping to your Kong instance
     - name: decK ping
       id: decK_ping
+      uses: ./
       with:
         command: "ping"
         options: "--kong-addr ${{ secrets.KONG_ADDR }} --headers ${{ secrets.KONG_HEADERS }}"  # This option can be ommited.  But if you want to use this you need to set the secrets in your repo settings to make it work
     # Check the structure of your files
     - name: decK validate
       id: decK_validate
+      uses: ./
       with:
         command: " gateway validate"
         options: "--kong-addr ${{ secrets.KONG_ADDR }} --headers ${{ secrets.KONG_HEADERS }}" 
@@ -26,6 +28,7 @@ jobs:
     # Check diff between the files and the Kong instance
     - name: decK diff
       id: decK_diff
+      uses: ./
       with:
         command: "gateway diff"
         options: "--kong-addr ${{ secrets.KONG_ADDR }} --headers ${{ secrets.KONG_HEADERS }}" 
@@ -34,6 +37,7 @@ jobs:
     # Sync the state of the files to the Kong instance and update the deployment status in your repo by GitHub Deployment API
     - name: decK sync
       id: decK_sync
+      uses: ./
       with:
         command: "gateway sync"
         options: "--kong-addr ${{ secrets.KONG_ADDR }} --headers ${{ secrets.KONG_HEADERS }}" 
