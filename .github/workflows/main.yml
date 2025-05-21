@@ -1,17 +1,41 @@
-name: GitHub Actions Demo
+name: Kong Konnect Deploy
 on:
-  push:
-    branches:
-    - 'develop'
-    - 'master'
+  pull_request:
+    branches: [ develop, master ]
 jobs:
-  deploy_to_clouds:
+  build:
     runs-on: ubuntu-latest
-    name: Apply the decK configuration
     steps:
-      - uses: kong/setup-deck@v1
-      #
-      # can be used to ensure no changes have occurred outside of our repo
-      # - run: deck konnect diff --non-zero-exit-code
-      #
-      - run: deck gateway sync
+    # Make sure checkout your git repository
+    - uses: actions/checkout@v2
+      name: "checkout"
+    # Ping to your Kong instance
+    - name: decK ping
+      id: decK_ping
+      with:
+        command: "ping"
+        options: "--kong-addr ${{ secrets.KONG_ADDR }} --headers ${{ secrets.KONG_HEADERS }}"  # This option can be ommited.  But if you want to use this you need to set the secrets in your repo settings to make it work
+    # Check the structure of your files
+    - name: decK validate
+      id: decK_validate
+      with:
+        command: " gateway validate"
+        options: "--kong-addr ${{ secrets.KONG_ADDR }} --headers ${{ secrets.KONG_HEADERS }}" 
+        kong_workspaces: "default"
+        #github_token: ${{ secrets.GITHUB_TOKEN }}
+    # Check diff between the files and the Kong instance
+    - name: decK diff
+      id: decK_diff
+      with:
+        command: "gateway diff"
+        options: "--kong-addr ${{ secrets.KONG_ADDR }} --headers ${{ secrets.KONG_HEADERS }}" 
+        kong_workspaces: "default"
+        #github_token: ${{ secrets.GITHUB_TOKEN }}
+    # Sync the state of the files to the Kong instance and update the deployment status in your repo by GitHub Deployment API
+    - name: decK sync
+      id: decK_sync
+      with:
+        command: "gateway sync"
+        options: "--kong-addr ${{ secrets.KONG_ADDR }} --headers ${{ secrets.KONG_HEADERS }}" 
+        kong_workspaces: "test/kong"
+        #github_token: ${{ secrets.GITHUB_TOKEN }}
