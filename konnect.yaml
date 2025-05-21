@@ -1,0 +1,999 @@
+_format_version: "3.0"
+_konnect:
+  control_plane_name: default
+consumers:
+- custom_id: MyTest
+  keyauth_credentials:
+  - key: MyTest
+  username: MyTest
+- basicauth_credentials:
+  - password: e9690f5d40bc4543981d74179eebaeeb994b7430
+    username: username
+  custom_id: Test2
+  keyauth_credentials:
+  - key: TestKey1
+  username: Test2
+- acls:
+  - group: testconsumer
+  keyauth_credentials:
+  - key: Key1
+  username: TestConsumer
+plugins:
+- config:
+    content_type: application/json
+    custom_fields_by_lua:
+      request.body.flightId: return '***masked***'
+      request.headers.apikey: return '***masked***'
+      request.querystring.apikey: return '***masked***'
+      request.uri: return '***masked***'
+      response.body[?].flightId: return '***masked***'
+    flush_timeout: null
+    headers:
+      Authorization: Splunk 23546ab4-9c1f-43f5-bd9e-70a7b5c129a2
+    http_endpoint: https://15.206.128.182:8088/services/collector/raw
+    keepalive: 60000
+    method: POST
+    queue:
+      concurrency_limit: 1
+      initial_retry_delay: 0.01
+      max_batch_size: 1
+      max_bytes: null
+      max_coalescing_delay: 1
+      max_entries: 10000
+      max_retry_delay: 60
+      max_retry_time: 60
+    queue_size: null
+    retry_count: null
+    timeout: 10000
+  enabled: true
+  name: http-log
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+- config:
+    access: []
+    body_filter:
+    - local responses = { ["No API key found in request"] = { message = "Please provide
+      an API key", status = 418, headers = { ["x-some-header"] = "some value" }, },
+      ["Invalid authentication credentials"] = { message = "Invalid API key", }, ["You
+      cannot consume this service"] ={ message = "Access denied for this service",
+      } } return function(status, body, headers) if not body or not body.message then
+      return status, body, headers end local response = responses[body.message] body.message
+      = response.message or body.message status = response.status or status headers
+      = response.headers or headers return status, body, headers end
+    certificate: []
+    functions: []
+    header_filter: []
+    log: []
+    rewrite: []
+    ws_client_frame: []
+    ws_close: []
+    ws_handshake: []
+    ws_upstream_frame: []
+  enabled: true
+  instance_name: Global-PostFUnctions
+  name: post-function
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+- config:
+    access:
+    - kong.service.request.enable_buffering() kong.log.set_serialize_value("request.body",
+      kong.request.get_body())
+    - local responses = { ["No API key found in request"] = { message = "Please provide
+      an API key", status = 418, headers = { ["x-some-header"] = "some value" }, },
+      ["Invalid authentication credentials"] = { message = "Invalid API key", }, ["You
+      cannot consume this service"] ={ message = "Access denied for this service",
+      } } return function(status, body, headers) if not body or not body.message then
+      return status, body, headers end local response = responses[body.message] body.message
+      = response.message or body.message status = response.status or status headers
+      = response.headers or headers return status, body, headers end
+    body_filter: []
+    certificate: []
+    functions: []
+    header_filter: []
+    log:
+    - kong.log.set_serialize_value("response.body", kong.service.response.get_body())
+    rewrite: []
+    ws_client_frame: []
+    ws_close: []
+    ws_handshake: []
+    ws_upstream_frame: []
+  enabled: true
+  name: pre-function
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+- config:
+    custom_fields_by_lua: {}
+    host: 15.207.222.116
+    keepalive: 60000
+    port: 8990
+    timeout: 10000
+    tls: false
+    tls_sni: null
+  enabled: false
+  name: tcp-log
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: apigeemock
+  name: Mocktarget
+  plugins:
+  - config:
+      anonymous: null
+      hide_credentials: true
+      realm: service
+    enabled: true
+    instance_name: MockTargetService-BasicAuthentication
+    name: basic-auth
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+    - ws
+    - wss
+  - config:
+      allow_origin_absent: true
+      credentials: true
+      exposed_headers: null
+      headers: null
+      max_age: null
+      methods:
+      - GET
+      - HEAD
+      - PUT
+      - PATCH
+      - POST
+      - DELETE
+      - OPTIONS
+      - TRACE
+      - CONNECT
+      origins: null
+      preflight_continue: false
+      private_network: false
+    enabled: true
+    name: cors
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+  - config:
+      allowed_header_parameters: Host,Content-Type,User-Agent,Accept,Content-Length
+      api_spec: |
+        ---
+        openapi: "3.0.0"
+        info:
+          description: "OpenAPI Specification for the Apigee mock target service endpoint."
+          version: "1.0.0"
+          title: "Mock Target API"
+        paths:
+          /:
+            get:
+              summary: "View personalized greeting"
+              operationId: "View a personalized greeting"
+              description: "View a personalized greeting for the specified or guest user."
+              parameters:
+              - name: "user"
+                in: "query"
+                description: "Your user name."
+                required: false
+                schema:
+                  type: "string"
+              responses:
+                "200":
+                  description: "Success"
+          /help:
+            get:
+              summary: "Get help"
+              operationId: "Get help"
+              description: "View help information about available resources in HTML format."
+              responses:
+                "200":
+                  description: "Success"
+          /user:
+            get:
+              summary: "View personalized greeting"
+              operationId: "View personalized greeting"
+              description: "View a personalized greeting for the specified or guest user."
+              parameters:
+              - name: "user"
+                in: "query"
+                description: "Your user name."
+                required: false
+                schema:
+                  type: "string"
+              responses:
+                "200":
+                  description: "Success"
+          /iloveapis:
+            get:
+              summary: "View API affirmation"
+              operationId: "View API affirmation"
+              description: "View API affirmation in HTML format."
+              responses:
+                "200":
+                  description: "Success"
+          /ip:
+            get:
+              summary: "View IP address"
+              operationId: "View IP address"
+              description: "View the IP address of the client in JSON format."
+              responses:
+                "200":
+                  description: "Success"
+          /xml:
+            get:
+              security:
+              - basicAuth: []
+              summary: "View XML response"
+              operationId: "View XML response"
+              description: "View a sample response in XML format."
+              responses:
+                "200":
+                  description: "Success"
+          /json:
+            get:
+              summary: "View JSON response"
+              operationId: "View JSON response"
+              description: "View a sample response in JSON format."
+              responses:
+                "200":
+                  description: "Success"
+          /echo:
+            get:
+              summary: "View request headers and body"
+              operationId: "View request headers and body"
+              description: "View the request headers and body in JSON format."
+              responses:
+                "200":
+                  description: "Success"
+            post:
+              summary: "Send request and view request headers and body"
+              operationId: "Send request and view request headers and body"
+              description: "Send a request and view the resulting request headers and body\
+                \ in JSON format. The request payload can be specified using one of the following\
+                \ formats: application/json, application/x-www-form-urlencoded, or application/xml."
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: "#/components/schemas/request-body"
+                description: "Request payload in application/json, application/x-www-form-urlencoded,\
+                  \ or application/xml format."
+                required: true
+              responses:
+                "200":
+                  description: "Success"
+          /statuscode/{code}:
+            get:
+              summary: "View status code and message"
+              operationId: "View status code and message"
+              description: "View status code and message for the specified value."
+              parameters:
+              - name: "code"
+                in: "path"
+                description: "HTTP status code."
+                required: true
+                schema:
+                  type: "string"
+              responses:
+                "200":
+                  description: "Success"
+          /auth:
+            get:
+              security:
+              - basicAuth: []
+              summary: "Validate access using basic authentication"
+              operationId: "Validate access using basic authentication"
+              description: "Validate access using basic authentication."
+              responses:
+                "200":
+                  description: "Success"
+        servers:
+        - url: "http://15.206.82.158:8000"
+        - url: "https://15.206.82.158:8443"
+        components:
+          securitySchemes:
+            basicAuth:
+              type: "http"
+              description: "HTTP Basic Authentication."
+              scheme: "basic"
+          schemas:
+            request-body:
+              properties:
+                replace-me:
+                  type: "object"
+                  description: "Replace with request payload in application/json, application/x-www-form-urlencoded,\
+                    \ or application/xml format."
+      api_spec_encoded: true
+      custom_base_path: null
+      header_parameter_check: false
+      include_base_path: false
+      notify_only_request_validation_failure: false
+      notify_only_response_body_validation_failure: false
+      query_parameter_check: false
+      validate_request_body: true
+      validate_request_header_params: true
+      validate_request_query_params: true
+      validate_request_uri_params: true
+      validate_response_body: false
+      verbose_response: false
+    enabled: false
+    name: oas-validation
+    protocols:
+    - http
+    - https
+  port: 443
+  protocol: https
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    methods:
+    - POST
+    name: apigeemock-echo
+    path_handling: v0
+    paths:
+    - ~/echo/(?<flightId>\w+)
+    plugins:
+    - config:
+        anonymous: null
+        hide_credentials: true
+        realm: route
+      enabled: true
+      instance_name: ApigeemockRoute-BasicAuthentication
+      name: basic-auth
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+      - ws
+      - wss
+    - config:
+        add:
+          body:
+          - age:20
+          - school:AMS
+          - flightId:$(uri_captures['flightId'])
+          headers:
+          - name:ksjss
+          - h1:v1
+          querystring:
+          - age:02
+        append:
+          body:
+          - nm:ks
+          headers: []
+          querystring: []
+        http_method: null
+        remove:
+          body: []
+          headers:
+          - isAPI
+          querystring:
+          - pageNo
+        rename:
+          body:
+          - name:myname
+          headers:
+          - corrId:correlationId
+          querystring:
+          - rowNo:rowNumber
+        replace:
+          body:
+          - name:m1Name
+          headers:
+          - h1:vinod
+          querystring:
+          - rowNumber:33
+          uri: null
+      enabled: true
+      name: request-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+  - https_redirect_status_code: 426
+    methods:
+    - GET
+    name: apigeemock-json
+    path_handling: v0
+    paths:
+    - ~/json/(?<flightId>\w+)
+    plugins:
+    - config:
+        anonymous: null
+        hide_credentials: true
+        realm: service
+      enabled: true
+      instance_name: ApigeemockRouteJSON-BasicAuthentication
+      name: basic-auth
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+      - ws
+      - wss
+    - config:
+        anonymous: null
+        hide_credentials: true
+        identity_realms:
+        - id: null
+          region: null
+          scope: cp
+        key_in_body: false
+        key_in_header: true
+        key_in_query: true
+        key_names:
+        - apikey
+        realm: null
+        run_on_preflight: true
+      enabled: true
+      name: key-auth
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+      - ws
+      - wss
+    - config:
+        cache:
+          cache_ttl: 300
+          memory:
+            dictionary_name: kong_db_cache
+          redis:
+            cluster_addresses: null
+            cluster_max_redirections: 5
+            cluster_nodes: null
+            connect_timeout: 2000
+            connection_is_proxied: false
+            database: 0
+            host: 127.0.0.1
+            keepalive_backlog: null
+            keepalive_pool_size: 256
+            password: null
+            port: 6379
+            read_timeout: 2000
+            send_timeout: 2000
+            sentinel_addresses: null
+            sentinel_master: null
+            sentinel_nodes: null
+            sentinel_password: null
+            sentinel_role: null
+            sentinel_username: null
+            server_name: null
+            ssl: false
+            ssl_verify: false
+            timeout: 2000
+            username: null
+          strategy: memory
+        callouts:
+        - cache:
+            bypass: false
+          depends_on: []
+          name: apigeemockjson
+          request:
+            body:
+              custom: {}
+              decode: true
+              forward: true
+            by_lua: null
+            error:
+              error_response_code: 400
+              error_response_msg: service callout error
+              http_statuses: null
+              on_error: fail
+              retries: 2
+            headers:
+              custom: null
+              forward: false
+            http_opts:
+              proxy: null
+              ssl_server_name: null
+              ssl_verify: false
+              timeouts: null
+            method: GET
+            query:
+              custom: null
+              forward: false
+            url: https://mocktarget.apigee.net:443/json
+          response:
+            body:
+              decode: true
+              store: true
+            by_lua: null
+            headers:
+              store: true
+        upstream:
+          body:
+            custom:
+              MYAGE: $(callouts.apigeemockjson.response.body.city)
+              MYNAME: $(callouts.apigeemockjson.response.body.firstName)
+            decode: true
+            forward: true
+          by_lua: null
+          headers:
+            custom:
+              state: $(callouts.apigeemockjson.response.body.state)
+            forward: true
+          query:
+            custom: null
+            forward: true
+      enabled: true
+      name: request-callout
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    - config:
+        add:
+          body:
+          - flightId:$(uri_captures['flightId'])
+          - firstName:$(shared.callouts.apigeemockjson.response.body.firstName)
+          headers:
+          - content-type:application/json
+          querystring: []
+        append:
+          body: []
+          headers: []
+          querystring: []
+        http_method: POST
+        remove:
+          body: []
+          headers: []
+          querystring: []
+        rename:
+          body: []
+          headers: []
+          querystring: []
+        replace:
+          body: []
+          headers: []
+          querystring: []
+          uri: /echo
+      enabled: true
+      instance_name: ApigeeMock-JSON-Request-Transformer
+      name: request-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+  - https_redirect_status_code: 426
+    methods:
+    - GET
+    name: apigeemock-xml
+    path_handling: v0
+    paths:
+    - /xml
+    plugins:
+    - config:
+        allow:
+        - testconsumer
+        always_use_authenticated_groups: false
+        deny: null
+        hide_groups_header: false
+        include_consumer_groups: false
+      enabled: true
+      name: acl
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    - config:
+        allow_origin_absent: true
+        credentials: true
+        exposed_headers: null
+        headers: null
+        max_age: null
+        methods:
+        - GET
+        - HEAD
+        - PUT
+        - PATCH
+        - POST
+        - DELETE
+        - OPTIONS
+        - TRACE
+        - CONNECT
+        origins: null
+        preflight_continue: false
+        private_network: false
+      enabled: true
+      name: cors
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    - config:
+        anonymous: null
+        hide_credentials: true
+        identity_realms:
+        - id: null
+          region: null
+          scope: cp
+        key_in_body: false
+        key_in_header: true
+        key_in_query: true
+        key_names:
+        - apikey
+        realm: null
+        run_on_preflight: true
+      enabled: true
+      name: key-auth
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+      - ws
+      - wss
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+  write_timeout: 60000
+- connect_timeout: 60000
+  enabled: true
+  host: 7341cb1a-2617-4687-920e-864a04623d5e.mock.pstmn.io
+  name: flights-service
+  plugins:
+  - config:
+      allowed_header_parameters: Host,Content-Type,User-Agent,Accept,Content-Length
+      api_spec: "---\nopenapi: \"3.0.0\"\ninfo:\n  description: \"OpenAPI Specification
+        for the Flights mock target service endpoint.\"\n  version: \"1.0.0\"\n  title:
+        \"Flights API\"\npaths:\n  /flights:\n    get:\n      summary: \"Get all Flights
+        details\"\n      operationId: \"Get all Flights details\"\n      description:
+        \"Get all Flights details.\"\n      parameters:\n      - name: \"fromDate\"\n
+        \       in: \"query\"\n        description: \"From date to search flights\"\n
+        \       required: true\n        schema:\n          type: \"string\"\n      -
+        name: \"returnDate\"\n        in: \"query\"\n        description: \"Return
+        date to search filghts\"\n        required: false\n        schema:\n          type:
+        \"string\"\n      - name: \"apikey\"\n        in: \"query\"\n        description:
+        \"API Key\"\n        required: true\n        schema:\n          type: \"string\"\n
+        \     responses:\n        \"200\":\n          description: \"Success\"\n          content:\n
+        \           application/json:\n              schema:\n                type:
+        array\n                items:\n                  $ref: \"#/components/schemas/flight\"\n
+        \   post:\n        summary: \"Create Flights details\"\n        operationId:
+        \"Create Flights details\"\n        description: \"Create Flights details.\"\n
+        \       parameters:\n          - name: \"apikey\"\n            in: \"header\"\n
+        \           description: \"API Key\"\n            required: true\n            schema:\n
+        \             type: \"string\"\n        requestBody:\n          content:\n
+        \           application/json:\n              schema:\n                  $ref:
+        \"#/components/schemas/flightCreate\"\n        responses:\n          \"200\":\n
+        \           description: \"Success\"\n            content:\n              application/json:\n
+        \               schema:\n                  type: object\n                  properties:\n
+        \                   flightId:\n                      type: string\n                      example:
+        \"HAJ98KJHAS\"\n  /flights/{flightId}:\n    parameters:\n        - name: flightId\n
+        \         in: path\n          description: ID of flight to return\n          required:
+        true\n          schema:\n            type: string\n    get:\n      summary:
+        \"Get flight details\"\n      operationId: \"Get flight details\"\n      description:
+        \"Get flight details\"\n      security:\n      - basicAuth: []\n      responses:\n
+        \       \"200\":\n          description: \"Success\"\n          content:\n
+        \           application/json:\n              schema:\n                  $ref:
+        \"#/components/schemas/flight\"\n  /auth:\n    get:\n      security:\n      -
+        basicAuth: []\n      summary: \"Validate access using basic authentication\"\n
+        \     operationId: \"Validate access using basic authentication\"\n      description:
+        \"Validate access using basic authentication.\"\n      responses:\n        \"200\":\n
+        \         description: \"Success\"\nservers:\n- url: \"http://15.206.82.158:8000\"\n-
+        url: \"https://15.206.82.158:8443\"\ncomponents:\n  securitySchemes:\n    basicAuth:\n
+        \     type: \"http\"\n      description: \"HTTP Basic Authentication.\"\n
+        \     scheme: \"basic\"\n  schemas:\n    flightCreate:\n      type: \"object\"\n
+        \     properties:\n        flightModel:\n          type: string\n          example:
+        \"Indigo6E\"\n          \n        flightName:\n          type: string\n          example:
+        \"Indigo\"\n        depatureTime:\n          type: string\n          example:
+        \"14/05/2024 12:30\"\n        arrivalTime:\n          type: string\n          example:
+        \"14/05/2024 12:30\"\n        \n        capacity:\n          type: integer\n
+        \         example: 500\n      required: \n        - flightName\n        -
+        flightModel\n        - depatureTime\n        - arrivalTime\n        - capacity\n
+        \      \n    flight:\n      type: \"object\"\n      properties:\n        flightModel:\n
+        \         type: string\n          example: \"Indigo6E\"\n        flightName:\n
+        \         type: string\n          example: \"Indigo\"\n        flightId:\n
+        \         type: string\n          example: \"27HKSS\"\n        depatureTime:\n
+        \         type: string\n          example: \"14/05/2024 12:30\"\n        arrivalTime:\n
+        \         type: string\n          example: \"14/05/2024 12:30\"\n        capacity:\n
+        \         type: integer\n          example: 500\n        seatsBooked:\n          type:
+        integer\n          example: 100\n        seatsAvailable:\n          type:
+        integer\n          example: 300\n       "
+      api_spec_encoded: true
+      custom_base_path: null
+      header_parameter_check: false
+      include_base_path: false
+      notify_only_request_validation_failure: false
+      notify_only_response_body_validation_failure: false
+      query_parameter_check: false
+      validate_request_body: true
+      validate_request_header_params: true
+      validate_request_query_params: true
+      validate_request_uri_params: true
+      validate_response_body: false
+      verbose_response: false
+    enabled: false
+    instance_name: flights-service-oas
+    name: oas-validation
+    protocols:
+    - http
+    - https
+  port: 443
+  protocol: https
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    methods:
+    - POST
+    name: add-flight
+    path_handling: v0
+    paths:
+    - /flights
+    plugins:
+    - config:
+        add:
+          headers: []
+          json:
+          - corr:34322244
+          json_types: []
+        append:
+          headers: []
+          json: []
+          json_types: []
+        remove:
+          headers: []
+          json: []
+        rename:
+          headers: []
+          json: []
+        replace:
+          headers: []
+          json: []
+          json_types: []
+      enabled: true
+      name: response-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+  - https_redirect_status_code: 426
+    methods:
+    - GET
+    name: get-flights-by-id
+    path_handling: v0
+    paths:
+    - ~/flights/(?<flightId>\w+)
+    plugins:
+    - config:
+        add:
+          body:
+          - flightId:$(uri_captures['flightId'])
+          headers: []
+          querystring: []
+        append:
+          body: []
+          headers: []
+          querystring: []
+        http_method: POST
+        remove:
+          body: []
+          headers: []
+          querystring: []
+        rename:
+          body: []
+          headers: []
+          querystring: []
+        replace:
+          body: []
+          headers: []
+          querystring: []
+          uri: /flights/myflights
+      enabled: true
+      name: request-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+  - https_redirect_status_code: 426
+    methods:
+    - GET
+    name: get-flights-details
+    path_handling: v0
+    paths:
+    - ~/flights$
+    plugins:
+    - config:
+        anonymous: null
+        hide_credentials: false
+        identity_realms:
+        - id: null
+          region: null
+          scope: cp
+        key_in_body: false
+        key_in_header: true
+        key_in_query: true
+        key_names:
+        - apikey
+        realm: null
+        run_on_preflight: true
+      enabled: true
+      name: key-auth
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+      - ws
+      - wss
+    - config:
+        add:
+          body: []
+          headers: []
+          querystring: []
+        append:
+          body: []
+          headers: []
+          querystring: []
+        http_method: null
+        remove:
+          body: []
+          headers: []
+          querystring: []
+        rename:
+          body: []
+          headers: []
+          querystring: []
+        replace:
+          body: []
+          headers: []
+          querystring: []
+          uri: /flights
+      enabled: true
+      instance_name: GetFlightDetails-Request-Transformer
+      name: request-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+  write_timeout: 60000
+upstreams:
+- algorithm: round-robin
+  hash_fallback: none
+  hash_on: none
+  hash_on_cookie_path: /
+  healthchecks:
+    active:
+      concurrency: 10
+      healthy:
+        http_statuses:
+        - 200
+        - 302
+        interval: 0
+        successes: 0
+      http_path: /
+      https_verify_certificate: true
+      timeout: 1
+      type: http
+      unhealthy:
+        http_failures: 0
+        http_statuses:
+        - 429
+        - 404
+        - 500
+        - 501
+        - 502
+        - 503
+        - 504
+        - 505
+        interval: 0
+        tcp_failures: 0
+        timeouts: 0
+    passive:
+      healthy:
+        http_statuses:
+        - 200
+        - 201
+        - 202
+        - 203
+        - 204
+        - 205
+        - 206
+        - 207
+        - 208
+        - 226
+        - 300
+        - 301
+        - 302
+        - 303
+        - 304
+        - 305
+        - 306
+        - 307
+        - 308
+        successes: 0
+      type: http
+      unhealthy:
+        http_failures: 0
+        http_statuses:
+        - 429
+        - 500
+        - 503
+        tcp_failures: 0
+        timeouts: 0
+    threshold: 0
+  name: apigeemock
+  slots: 10000
+  targets:
+  - target: mocktarget.apigee.net:443
+    weight: 100
+  use_srv_name: false
+vaults:
+- config:
+    prefix: MY_SECRET
+  name: env
+  prefix: my-secret
