@@ -2,7 +2,8 @@ name: GitHub Actions Demo
 on:
   push:
     branches:
-    - 'deploy'
+    - 'develop'
+    - 'master'
 jobs:
   deploy_to_clouds:
     runs-on: ubuntu-latest
