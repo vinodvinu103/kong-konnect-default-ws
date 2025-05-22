@@ -11,7 +11,8 @@ jobs:
     steps:
       - name: Install decK
         run: |
-          curl -sL https://github.com/kong/deck/releases/latest/download/deck-linux-amd64.tar.gz | tar xz
+          curl -sL https://github.com/kong/deck/releases/latest/download/deck-linux-amd64 -o deck
+          chmod +x deck
           sudo mv deck /usr/local/bin/
 
       - name: Ping Kong Konnect
