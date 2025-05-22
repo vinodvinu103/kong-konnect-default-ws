@@ -17,4 +17,4 @@ jobs:
 
       - name: Ping Kong Konnect
         run: |
-          deck ping --konnect-addr ${{ secrets.KONG_ADDR }} --konnect-token ${{ secrets.DECK_KONNECT_TOKEN }}
+          deck gateway ping --konnect-addr ${{ secrets.KONG_ADDR }} --konnect-token ${{ secrets.DECK_KONNECT_TOKEN }}

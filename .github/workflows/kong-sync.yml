@@ -17,4 +17,4 @@ jobs:
 
       - name: Sync configuration to Kong Konnect
         run: |
-          deck sync -s kong.yaml --konnect-addr ${{ secrets.KONG_ADDR }} --konnect-token ${{ secrets.DECK_KONNECT_TOKEN }}
+          deck gateway sync -s kong.yaml --konnect-addr ${{ secrets.KONG_ADDR }} --konnect-token ${{ secrets.DECK_KONNECT_TOKEN }}

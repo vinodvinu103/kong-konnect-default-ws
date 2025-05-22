@@ -19,4 +19,4 @@ jobs:
 
       - name: Validate configuration
         run: |
-          deck validate -s kong.yaml
+          deck gateway validate -s kong.yaml
