@@ -1,0 +1,14 @@
+name: Kong Ping
+
+on:
+  push:
+    paths:
+      - '.github/workflows/kong-ping.yml'
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Kong Konnect
+        run: |
+          curl -I ${{ secrets.KONG_ADDR }}

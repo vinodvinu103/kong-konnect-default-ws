@@ -1,0 +1,19 @@
+name: Kong Sync
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install decK
+        run: |
+          curl -sL https://github.com/kong/deck/releases/latest/download/deck-linux-amd64.tar.gz | tar xz
+          sudo mv deck /usr/local/bin/
+
+      - name: Sync configuration to Kong Konnect
+        run: |
+          deck sync -s kong.yaml --konnect-addr ${{ secrets.KONG_ADDR }} --konnect-token ${{ secrets.DECK_KONG_TOKEN }}
