@@ -9,6 +9,11 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
+      - name: Install decK
+        run: |
+          curl -sL https://github.com/kong/deck/releases/latest/download/deck-linux-amd64.tar.gz | tar xz
+          sudo mv deck /usr/local/bin/
+
       - name: Ping Kong Konnect
         run: |
-          curl -I ${{ secrets.KONG_ADDR }}
+          deck ping --konnect-addr ${{ secrets.KONG_ADDR }} --konnect-token ${{ secrets.DECK_KONNECT_TOKEN }}

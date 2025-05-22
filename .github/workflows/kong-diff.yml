@@ -18,4 +18,4 @@ jobs:
 
       - name: Show diff with Kong Konnect
         run: |
-          deck diff -s kong.yaml --konnect-addr ${{ secrets.KONG_ADDR }} --konnect-token ${{ secrets.DECK_KONG_TOKEN }}
+          deck diff -s kong.yaml --konnect-addr ${{ secrets.KONG_ADDR }} --konnect-token ${{ secrets.DECK_KONNECT_TOKEN }}
